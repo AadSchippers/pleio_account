@@ -24,6 +24,8 @@ from core import views
 from core.class_views import PleioLoginView
 from two_factor.views import ProfileView, BackupTokensView, SetupCompleteView, DisableView
 from user_sessions.views import SessionListView
+from two_factor.views import LoginView, ProfileView, SetupView
+
 
 legacy_urls = [
     url(r'^mod/profile/icondirect.php$', views.avatar, name='avatar_legacy'),
@@ -48,6 +50,10 @@ urls = [
     url(r'^account/two_factor/backup/tokens/$', view=BackupTokensView.as_view(template_name='backup_tokens.html'), name = 'backup_tokens'),
     url(r'^account/two_factor/disable/$', view=DisableView.as_view(template_name='tf_disable.html'), name='disable'),
     url(r'^account/sessions/$', view=SessionListView.as_view(template_name='session_list.html'), name='session_list'),
+    url(r'^login/$', LoginView.as_view(template_name='login.html'), name='login'),
+    url(r'^logout/$', views.logout, name='logout'),
+    url(r'^profile/$', views.profile, name='profile'),
+    url(r'^account/two_factor/$', SetupView.as_view(template_name='tf_setup.html'), name='setup'),
     url(r'^oauth/v2/authorize$', oauth2_views.AuthorizationView.as_view(), name='authorize'),
     url(r'^oauth/v2/token$', oauth2_views.TokenView.as_view(), name='token'),
     url(r'^oauth/v2/revoke_token$', oauth2_views.RevokeTokenView.as_view(), name='revoke-token'),
@@ -59,11 +65,13 @@ urls = [
 tf_urls = [
     url(r'', include('two_factor.urls', 'two_factor'))
 ]
+
 us_urls = [
     url(r'', include('user_sessions.urls', 'user_sessions'))
 ]
 
 urlpatterns = legacy_urls + urls +  tf_urls + us_urls
+
 
 
 if settings.DEBUG:
