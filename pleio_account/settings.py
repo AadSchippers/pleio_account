@@ -55,7 +55,11 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles'
+    'django.contrib.staticfiles',
+    'django_otp',
+    'django_otp.plugins.otp_static',
+    'django_otp.plugins.otp_totp',
+    'two_factor',
 ]
 
 REST_FRAMEWORK = {
@@ -80,6 +84,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django_otp.middleware.OTPMiddleware',
 ]
 
 ROOT_URLCONF = 'pleio_account.urls'
@@ -171,7 +177,7 @@ STATICFILES_DIRS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
-LOGIN_URL = '/login/'
+LOGIN_URL = 'two_factor:login'
 LOGIN_REDIRECT_URL = '/profile/'
 
 FROM_EMAIL = ('Pleio', 'no-reply@pleio.nl')
@@ -183,3 +189,5 @@ ACCOUNT_ACTIVATION_DAYS = 7
 
 AXES_LOGIN_FAILURE_LIMIT = 20
 AXES_COOLOFF_TIME = 1
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
