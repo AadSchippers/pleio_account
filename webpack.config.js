@@ -49,6 +49,7 @@ module.exports = {
     },
     devServer: {
         publicPath: "http://localhost:3001/assets/bundles/",
+        headers: { "Access-Control-Allow-Origin": "*" },
         hot: true,
         port: 3001
     },
