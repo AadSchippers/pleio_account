@@ -43,7 +43,3 @@ class PleioLoginView(LoginView):
                 send_login_check(self.request, user)
 
         return LoginView.done(self, form_list, **kwargs)
-
-
-
-
