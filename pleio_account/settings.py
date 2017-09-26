@@ -189,5 +189,3 @@ ACCOUNT_ACTIVATION_DAYS = 7
 
 AXES_LOGIN_FAILURE_LIMIT = 20
 AXES_COOLOFF_TIME = 1
-
-SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'

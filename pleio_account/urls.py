@@ -21,7 +21,8 @@ from oauth2_provider import views as oauth2_views
 from api import views as api_views
 from django.contrib import admin
 from core import views
-from two_factor.views import LoginView, ProfileView, SetupView
+from core.class_views import PleioLoginView
+from two_factor.views import ProfileView, SetupView
 
 legacy_urls = [
     url(r'^mod/profile/icondirect.php$', views.avatar, name='avatar_legacy'),
@@ -36,10 +37,23 @@ urls = [
     url(r'^password_reset/done/$', auth_views.password_reset_done, { 'template_name': 'password_reset_done.html' }, name='password_reset_done'),
     url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', auth_views.password_reset_confirm, { 'template_name': 'password_reset_confirm.html' }, name='password_reset_confirm'),
     url(r'^reset/done/$', auth_views.password_reset_complete, { 'template_name': 'password_reset_complete.html' }, name='password_reset_complete'),
-    url(r'^login/$', LoginView.as_view(template_name='login.html'), name='login'),
+    url(r'^login/$', PleioLoginView.as_view(), name='login'),
     url(r'^logout/$', views.logout, name='logout'),
     url(r'^profile/$', views.profile, name='profile'),
-    url(r'^account/two_factor/$', SetupView.as_view(template_name='tf_setup.html'), name='setup'),
+    url(r'^account/two_factor/setup/$', SetupView.as_view(
+#            success_url = 'tf_profile',
+            template_name='tf_setup.html',
+            condition_dict={
+                'welcome': True,
+                'generator': lambda self: self.get_method() == 'generator',
+                'call': lambda self: self.get_method() == 'call',
+                'sms': lambda self: self.get_method() == 'sms',
+                'validation': lambda self: self.get_method() in ('sms', 'call'),
+                'yubikey': lambda self: self.get_method() == 'yubikey',
+                }
+            ),
+            name='setup'),
+    url(r'^account/two_factor/$', view=ProfileView.as_view(template_name='tf_profile.html'), name='tf_profile', ),
     url(r'^oauth/v2/authorize$', oauth2_views.AuthorizationView.as_view(), name='authorize'),
     url(r'^oauth/v2/token$', oauth2_views.TokenView.as_view(), name='token'),
     url(r'^oauth/v2/revoke_token$', oauth2_views.RevokeTokenView.as_view(), name='revoke-token'),

@@ -20,7 +20,7 @@ msgstr ""
 
 #: core/templates/registration/activate.html:6
 msgid "Account activation failed"
-msgstr ""
+msgstr "Het activeren van het account is mislukt"
 
 #: core/templates/registration/activation_complete.html:5
 msgid "Your account is now activated."
