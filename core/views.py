@@ -8,6 +8,11 @@ from django.contrib.auth import views
 from .helpers import send_activation_token, activate_and_login_user
 from .forms import RegisterForm, UserProfileForm
 from .models import User
+from django.urls import reverse
+from base64 import b32encode
+from binascii import unhexlify
+from django_otp.util import random_hex
+from two_factor.forms import TOTPDeviceForm
 
 def home(request):
     if request.user.is_authenticated():
@@ -78,3 +83,29 @@ def avatar(request):
         pass
 
     return redirect(DEFAULT_AVATAR)
+
+@login_required
+def tf_setup(request):
+
+    if request.method == 'POST':
+        key = request.session.get('tf_key')
+        print(key)
+        form = TOTPDeviceForm(key=key, user=request.user, metadata=request.POST)
+
+        print(form.is_valid())
+        if form.is_valid():
+            device = form.save()
+            django_otp.login(self.request, device)
+            return redirect('two_factor:setup_complete')
+
+#    else:
+#        key = random_hex(20).decode('ascii')
+#        rawkey = unhexlify(key.encode('ascii'))
+#        b32key = b32encode(rawkey).decode('utf-8')
+#        request.session['tf_key'] = b32key
+
+
+    return render(request, 'tf_setup.html', {
+        'form': TOTPDeviceForm(key=key, user=request.user),
+        'QR_URL': reverse('two_factor:qr')
+    })

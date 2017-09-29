@@ -21,8 +21,8 @@ from oauth2_provider import views as oauth2_views
 from api import views as api_views
 from django.contrib import admin
 from core import views
-from core.class_views import PleioLoginView
-from two_factor.views import ProfileView, SetupView
+from core.class_views import PleioLoginView, PleioSetupView
+from two_factor.views import ProfileView
 
 legacy_urls = [
     url(r'^mod/profile/icondirect.php$', views.avatar, name='avatar_legacy'),
@@ -40,19 +40,7 @@ urls = [
     url(r'^login/$', PleioLoginView.as_view(), name='login'),
     url(r'^logout/$', views.logout, name='logout'),
     url(r'^profile/$', views.profile, name='profile'),
-    url(r'^account/two_factor/setup/$', SetupView.as_view(
-#            success_url = 'tf_profile',
-            template_name='tf_setup.html',
-            condition_dict={
-                'welcome': True,
-                'generator': lambda self: self.get_method() == 'generator',
-                'call': lambda self: self.get_method() == 'call',
-                'sms': lambda self: self.get_method() == 'sms',
-                'validation': lambda self: self.get_method() in ('sms', 'call'),
-                'yubikey': lambda self: self.get_method() == 'yubikey',
-                }
-            ),
-            name='setup'),
+    url(r'^account/two_factor/setup/$', views.tf_setup, name='tf_setup'),
     url(r'^account/two_factor/$', view=ProfileView.as_view(template_name='tf_profile.html'), name='tf_profile', ),
     url(r'^oauth/v2/authorize$', oauth2_views.AuthorizationView.as_view(), name='authorize'),
     url(r'^oauth/v2/token$', oauth2_views.TokenView.as_view(), name='token'),
