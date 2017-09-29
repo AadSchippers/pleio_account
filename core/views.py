@@ -16,15 +16,18 @@ import django_otp
 from user_sessions.models import Session
 from core.class_views import PleioLoginView
 
+
 def home(request):
     if request.user.is_authenticated():
         return redirect('profile')
-    
+
     return redirect('login')
+
 
 def logout(request):
     auth.logout(request)
     return redirect('login')
+
 
 def register(request):
     if request.user.is_authenticated():
@@ -48,10 +51,12 @@ def register(request):
     else:
         form = RegisterForm()
 
-    return render(request, 'register.html', { 'form': form })
+    return render(request, 'register.html', {'form': form})
+
 
 def register_complete(request):
     return render(request, 'register_complete.html')
+
 
 def register_activate(request, activation_key=None):
     if request.user.is_authenticated():
@@ -63,6 +68,7 @@ def register_activate(request, activation_key=None):
 
     return render(request, 'register_activate.html')
 
+
 @login_required
 def profile(request):
     if request.method == 'POST':
@@ -73,7 +79,8 @@ def profile(request):
     else:
         form = UserProfileForm(instance=request.user)
 
-    return render(request, 'profile.html', { 'form': form })
+    return render(request, 'profile.html', {'form': form})
+
 
 def avatar(request):
     DEFAULT_AVATAR = '/static/images/gebruiker.svg'
@@ -87,9 +94,9 @@ def avatar(request):
 
     return redirect(DEFAULT_AVATAR)
 
+
 @login_required
 def tf_setup(request):
-
     if request.method == 'POST':
         key = request.session.get('tf_key')
         form = PleioTOTPDeviceForm(data=request.POST, key=key, user=request.user)
@@ -111,4 +118,3 @@ def tf_setup(request):
         'form': PleioTOTPDeviceForm(key=key, user=request.user),
         'QR_URL': reverse('two_factor:qr')
     })
-
