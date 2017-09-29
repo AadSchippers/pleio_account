@@ -13,6 +13,9 @@ from base64 import b32encode
 from binascii import unhexlify
 from django_otp.util import random_hex
 from two_factor.forms import TOTPDeviceForm
+import django_otp
+import qrcode
+import qrcode.image.svg
 
 def home(request):
     if request.user.is_authenticated():
@@ -89,21 +92,20 @@ def tf_setup(request):
 
     if request.method == 'POST':
         key = request.session.get('tf_key')
-        print(key)
-        form = TOTPDeviceForm(key=key, user=request.user, metadata=request.POST)
+        form = TOTPDeviceForm(data=request.POST, key=key, user=request.user)
 
-        print(form.is_valid())
         if form.is_valid():
             device = form.save()
-            django_otp.login(self.request, device)
+            django_otp.login(request, device)
             return redirect('two_factor:setup_complete')
 
-#    else:
-#        key = random_hex(20).decode('ascii')
-#        rawkey = unhexlify(key.encode('ascii'))
-#        b32key = b32encode(rawkey).decode('utf-8')
-#        request.session['tf_key'] = b32key
+    else:
+        key = random_hex(20).decode('ascii')
+        rawkey = unhexlify(key.encode('ascii'))
+        b32key = b32encode(rawkey).decode('utf-8')
 
+        request.session['tf_key'] = key
+        request.session['django_two_factor-qr_secret_key'] = b32key
 
     return render(request, 'tf_setup.html', {
         'form': TOTPDeviceForm(key=key, user=request.user),
