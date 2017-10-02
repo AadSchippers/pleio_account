@@ -21,7 +21,7 @@ from oauth2_provider import views as oauth2_views
 from api import views as api_views
 from django.contrib import admin
 from core import views
-from core.class_views import PleioLoginView, PleioSetupView
+from core.class_views import PleioLoginView
 from two_factor.views import ProfileView
 
 legacy_urls = [

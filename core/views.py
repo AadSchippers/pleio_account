@@ -6,16 +6,13 @@ from django.conf import settings
 from django.core import signing
 from django.contrib.auth import views
 from .helpers import send_activation_token, activate_and_login_user
-from .forms import RegisterForm, UserProfileForm
+from .forms import RegisterForm, UserProfileForm, PleioTOTPDeviceForm
 from .models import User
 from django.urls import reverse
 from base64 import b32encode
 from binascii import unhexlify
 from django_otp.util import random_hex
-from two_factor.forms import TOTPDeviceForm
 import django_otp
-import qrcode
-import qrcode.image.svg
 
 def home(request):
     if request.user.is_authenticated():
@@ -92,7 +89,7 @@ def tf_setup(request):
 
     if request.method == 'POST':
         key = request.session.get('tf_key')
-        form = TOTPDeviceForm(data=request.POST, key=key, user=request.user)
+        form = PleioTOTPDeviceForm(data=request.POST, key=key, user=request.user)
 
         if form.is_valid():
             device = form.save()
@@ -108,6 +105,6 @@ def tf_setup(request):
         request.session['django_two_factor-qr_secret_key'] = b32key
 
     return render(request, 'tf_setup.html', {
-        'form': TOTPDeviceForm(key=key, user=request.user),
+        'form': PleioTOTPDeviceForm(key=key, user=request.user),
         'QR_URL': reverse('two_factor:qr')
     })

@@ -2,7 +2,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 from django.contrib.auth import password_validation
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
-from two_factor.forms import AuthenticationTokenForm
+from two_factor.forms import AuthenticationTokenForm, TOTPDeviceForm
 from two_factor.utils import totp_digits
 from .models import User
 
@@ -53,4 +53,7 @@ class PleioAuthenticationForm(AuthenticationForm):
         fields = ('email', 'password', 'is_persistent')
 
 class PleioAuthenticationTokenForm(AuthenticationTokenForm):
-    otp_token = forms.IntegerField(widget=forms.TextInput)
+    otp_token = forms.IntegerField(label=_("Token"), widget=forms.TextInput)
+
+class PleioTOTPDeviceForm(TOTPDeviceForm):
+    token = forms.IntegerField(label=_("Token"), widget=forms.TextInput)

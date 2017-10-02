@@ -2,6 +2,15 @@
 {% load i18n %}
 
 {% block content %}
+<script type="text/javascript">
+  window.onload = function() {
+     {
+      document.getElementById("id_token").focus();
+    }
+  };
+</script>
+
+
 <form method="post" action=".">
     {% csrf_token %}
     <fieldset>
@@ -13,18 +22,16 @@
 
             <div class="input-field">
                 {{ form }}
-<!--
-                <input autofocus="autofocus"
-                       id="id_token-otp_token"
-                       max="999999"
-                       min="1"
-                       name="token-otp_token"
-                       type="number">
--->
             </div>
+            <table><tr>
+                <td {padding: 15px;}>
+                   <a href="{% url 'profile' %}" class="button">{% trans "Back" %}</a>
+                 </td>
+                <td {padding: 15px;}>
+                    <button name="volgende" class="button  ___active login__login" type="submit">{% trans "Next" %}</button>
+                </td>
+            </tr></table>
 
     </fieldset>
-
-    {% include "two_factor/_wizard_actions.html" %}
   </form>
 {% endblock %}
