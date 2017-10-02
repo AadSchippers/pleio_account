@@ -22,8 +22,12 @@ from api import views as api_views
 from django.contrib import admin
 from core import views
 from core.class_views import PleioLoginView
+<<<<<<< 3afac960920ef462a754e98aae2b9aff6ddd36aa
 from two_factor.views import ProfileView, BackupTokensView, SetupCompleteView, DisableView
 from user_sessions.views import SessionListView
+=======
+from two_factor.views import ProfileView
+>>>>>>> wip two factor authorization
 
 legacy_urls = [
     url(r'^mod/profile/icondirect.php$', views.avatar, name='avatar_legacy'),
