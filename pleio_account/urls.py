@@ -22,7 +22,7 @@ from api import views as api_views
 from django.contrib import admin
 from core import views
 from core.class_views import PleioLoginView
-from two_factor.views import ProfileView
+from two_factor.views import ProfileView, BackupTokensView, SetupCompleteView, DisableView
 
 legacy_urls = [
     url(r'^mod/profile/icondirect.php$', views.avatar, name='avatar_legacy'),
@@ -40,8 +40,12 @@ urls = [
     url(r'^login/$', PleioLoginView.as_view(), name='login'),
     url(r'^logout/$', views.logout, name='logout'),
     url(r'^profile/$', views.profile, name='profile'),
+    url(r'^account/login/$', PleioLoginView.as_view(), name='login'),
     url(r'^account/two_factor/setup/$', views.tf_setup, name='tf_setup'),
-    url(r'^account/two_factor/$', view=ProfileView.as_view(template_name='tf_profile.html'), name='tf_profile', ),
+    url(r'^account/two_factor/setup/complete/$', view=SetupCompleteView.as_view(template_name = 'setup_complete.html'), name='setup_complete' ),
+    url(r'^account/two_factor/$', view=ProfileView.as_view(template_name='tf_profile.html'), name='tf_profile' ),
+    url(r'^account/two_factor/backup/tokens/$', view=BackupTokensView.as_view(template_name='backup_tokens.html'), name = 'backup_tokens'),
+    url(r'^account/two_factor/disable/$', view=DisableView.as_view(template_name='tf_disable.html'), name='disable'),
     url(r'^oauth/v2/authorize$', oauth2_views.AuthorizationView.as_view(), name='authorize'),
     url(r'^oauth/v2/token$', oauth2_views.TokenView.as_view(), name='token'),
     url(r'^oauth/v2/revoke_token$', oauth2_views.RevokeTokenView.as_view(), name='revoke-token'),
