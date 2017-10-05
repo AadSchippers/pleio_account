@@ -21,7 +21,9 @@
             <p><img src="{{ QR_URL }}" alt="QR Code" /></p>
 
             <div class="input-field">
-                {{ form }}
+                {{ form.errors.token }}
+                {{ form.token.label_tag }}
+                {{ form.token }}
             </div>
             <table><tr>
                 <td {padding: 15px;}>

@@ -58,9 +58,9 @@
     </script>
     <p>Vul een twee-factor code in.</p>
         <div class="input-field">
-            <label for="id_token-otp_token">Token:</label>
             {{ form.errors.otp_token }}
-            {{ wizard.form.otp_token }}
+            {{ form.otp_token.label_tag }}
+            {{ form.otp_token }}
         </div>
         <button name="volgende" class="button ___stretch ___active login__login" type="submit">{% trans "Login" %}</button>
     {% elif wizard.steps.current == 'backup' %}
