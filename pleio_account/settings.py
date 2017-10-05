@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
+    'user_sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_otp',
@@ -78,7 +78,7 @@ REST_FRAMEWORK = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    'user_sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -120,6 +120,7 @@ DATABASES = {
     }
 }
 
+SESSION_ENGINE = 'user_sessions.backends.db'
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
@@ -174,11 +175,14 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'assets/'),
 ]
 
+GEOIP_PATH = os.path.join(BASE_DIR, 'geopip2/')
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 LOGIN_URL = 'two_factor:login'
 LOGIN_REDIRECT_URL = '/profile/'
+LOGOUT_REDIRECT_URL = 'two_factor:login'
 
 FROM_EMAIL = ('Pleio', 'no-reply@pleio.nl')
 EMAIL_HOST = 'localhost'
