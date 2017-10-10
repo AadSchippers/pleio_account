@@ -2,6 +2,7 @@ from .forms import PleioAuthenticationForm, PleioAuthenticationTokenForm
 
 from two_factor.forms import TOTPDeviceForm, BackupTokenForm
 from two_factor.views.core import LoginView, SetupView
+from user_sessions.models import Session
 
 class PleioLoginView(LoginView):
     template_name = 'login.html'

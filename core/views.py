@@ -5,7 +5,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.core import signing
 from django.contrib.auth import views
-from .helpers import send_activation_token, activate_and_login_user
+from .helpers import send_activation_token, activate_and_login_user, send_login_check
 from .forms import RegisterForm, UserProfileForm, PleioTOTPDeviceForm
 from .models import User
 from django.urls import reverse
@@ -13,6 +13,7 @@ from base64 import b32encode
 from binascii import unhexlify
 from django_otp.util import random_hex
 import django_otp
+from user_sessions.models import Session
 
 def home(request):
     if request.user.is_authenticated():
@@ -108,3 +109,16 @@ def tf_setup(request):
         'form': PleioTOTPDeviceForm(key=key, user=request.user),
         'QR_URL': reverse('two_factor:qr')
     })
+
+@login_required
+def check_session(request):
+    sc = request.session
+    us = request.user
+    sf = Session.objects.all()
+    sf = sf.exclude(session_key=sc.session_key)
+    sf = sf.filter(ip=sc.ip)
+    sf = sf.filter(user=us)
+    sf = sf.filter(user_agent=sc.user_agent)
+    if sf.count() == 0:
+        send_login_check(request)
+    return redirect('profile')
