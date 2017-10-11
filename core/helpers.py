@@ -56,8 +56,7 @@ def unique_filepath(self, filename):
     filename = "%s.%s" % (uuid.uuid4(), ext)
     return os.path.join('avatars/', filename)
 
-def send_login_check(request):
-    user = request.user
+def send_login_check(request, user):
     session = request.session
     template_context = {
         'site': get_current_site(request),

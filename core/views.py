@@ -110,15 +110,3 @@ def tf_setup(request):
         'QR_URL': reverse('two_factor:qr')
     })
 
-@login_required
-def check_session(request):
-    sc = request.session
-    us = request.user
-    sf = Session.objects.all()
-    sf = sf.exclude(session_key=sc.session_key)
-    sf = sf.filter(ip=sc.ip)
-    sf = sf.filter(user=us)
-    sf = sf.filter(user_agent=sc.user_agent)
-    if sf.count() == 0:
-        send_login_check(request)
-    return redirect('profile')
