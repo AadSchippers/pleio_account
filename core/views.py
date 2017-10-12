@@ -14,6 +14,7 @@ from binascii import unhexlify
 from django_otp.util import random_hex
 import django_otp
 from user_sessions.models import Session
+from core.class_views import PleioLoginView
 
 def home(request):
     if request.user.is_authenticated():
@@ -110,3 +111,11 @@ def tf_setup(request):
         'QR_URL': reverse('two_factor:qr')
     })
 
+
+@login_required
+def check_session(request):
+
+    if request.session['mail_needed']:
+        send_login_check(request, request.user)
+
+    return redirect('profile')

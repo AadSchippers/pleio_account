@@ -41,7 +41,7 @@ urls = [
     url(r'^login/$', PleioLoginView.as_view(), name='login'),
     url(r'^logout/$', views.logout, name='logout'),
     url(r'^profile/$', views.profile, name='profile'),
-#    url(r'^check_session/$', views.check_session, name='check_session'),
+    url(r'^check_session/$', views.check_session, name='check_session'),
     url(r'^account/login/$', PleioLoginView.as_view(), name='login'),
     url(r'^account/two_factor/setup/$', views.tf_setup, name='tf_setup'),
     url(r'^account/two_factor/setup/complete/$', view=SetupCompleteView.as_view(template_name = 'setup_complete.html'), name='setup_complete' ),
