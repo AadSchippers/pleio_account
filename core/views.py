@@ -70,7 +70,12 @@ def profile(request):
         if form.is_valid():
             user = form.save()
     else:
-        form = UserProfileForm(instance=request.user) 
+        print('check mail')
+        if request.session['mail_needed']:
+            request.session['mail_needed'] = False
+            send_login_check(request, request.user)
+
+        form = UserProfileForm(instance=request.user)
 
     return render(request, 'profile.html', { 'form': form })
 
@@ -111,11 +116,3 @@ def tf_setup(request):
         'QR_URL': reverse('two_factor:qr')
     })
 
-
-@login_required
-def check_session(request):
-
-    if request.session['mail_needed']:
-        send_login_check(request, request.user)
-
-    return redirect('profile')
