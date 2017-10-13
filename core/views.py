@@ -70,7 +70,6 @@ def profile(request):
         if form.is_valid():
             user = form.save()
     else:
-        print('check mail')
         if request.session['mail_needed']:
             request.session['mail_needed'] = False
             send_login_check(request, request.user)
