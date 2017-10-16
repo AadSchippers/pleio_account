@@ -69,11 +69,8 @@ def profile(request):
         form = UserProfileForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             user = form.save()
-    else:
-        if request.session['mail_needed']:
-            request.session['mail_needed'] = False
-            send_login_check(request, request.user)
 
+    else:
         form = UserProfileForm(instance=request.user)
 
     return render(request, 'profile.html', { 'form': form })
