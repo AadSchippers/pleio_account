@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.utils import timezone
 from django.utils.text import slugify
 from django.core.mail import send_mail
 from django.contrib import admin
@@ -91,5 +92,47 @@ class User(AbstractBaseUser):
     @property
     def is_staff(self):
         return self.is_admin
+
+class Previous_logins(models.Model):
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    ip = models.GenericIPAddressField(null=True, blank=True, verbose_name='IP')
+    location =  models.CharField(null=True, max_length=200)
+    user_agent = models.CharField(null=True, blank=True, max_length=200)
+    last_login_date = models.DateTimeField(
+            default=timezone.now)
+    confirmed_login = models.BooleanField(default=False)
+
+    def add_known_login(session, user):
+        print('user: ', user)
+        login = Previous_logins.objects.create(
+            user = user,
+            ip = session.ip,
+            location = None,
+            user_agent = session.user_agent)
+        login.save()
+
+    def is_known_login(session, email):
+        user = User.objects.get(email=email)
+
+        login = Previous_logins.objects.all()
+        login = login.filter(user=user)
+        login = login.filter(ip=session.ip)
+        login = login.filter(user_agent=session.user_agent)
+
+        if login.count() == 0:
+            self = Previous_logins
+            self.add_known_login(session, user)
+        else:
+            for l in login:
+                l.last_login_date = timezone.now()
+                l.save()
+
+        return (login.count() > 0)
+
+    def confirm_login(self):
+        self.confirmed_login = True
+        self.save()
+
+
 
 admin.site.register(User)
