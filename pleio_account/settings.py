@@ -26,7 +26,7 @@ SECRET_KEY = '5svsb7*kzmz#2aw&=tp^vio_g1is43!m60)%y7jv)xt=&!jw=x'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '172.17.0.1', '127.0.0.1']
 
 WEBPACK_LOADER = {
     'DEFAULT': {
@@ -175,7 +175,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'assets/'),
 ]
 
-GEOIP_PATH = os.path.join(BASE_DIR, 'geopip2/')
+GEOIP_PATH = os.path.join(BASE_DIR, 'assets/geopip2/')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')

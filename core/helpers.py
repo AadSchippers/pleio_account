@@ -56,7 +56,9 @@ def unique_filepath(self, filename):
     filename = "%s.%s" % (uuid.uuid4(), ext)
     return os.path.join('avatars/', filename)
 
-def send_login_check(request, user):
+def send_suspicious_login_message(request, user):
+#    from .models import User
+
     session = request.session
     template_context = {
         'site': get_current_site(request),
@@ -66,7 +68,7 @@ def send_login_check(request, user):
     }
 
     user.email_user(
-        render_to_string('emails/login_check_subject.txt', template_context),
-        render_to_string('emails/login_check.txt', template_context),
+        render_to_string('emails/send_suspicious_login_message_subject.txt', template_context),
+        render_to_string('emails/send_suspicious_login_message.txt', template_context),
         settings.DEFAULT_FROM_EMAIL
     )
