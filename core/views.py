@@ -5,7 +5,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.core import signing
 from django.contrib.auth import views
-from .helpers import send_activation_token, activate_and_login_user, send_suspicious_login_message
+from .helpers import send_activation_token, activate_and_login_user, send_login_check
 from .forms import RegisterForm, UserProfileForm, PleioTOTPDeviceForm
 from .models import User
 from django.urls import reverse
@@ -85,12 +85,8 @@ def profile(request):
 def avatar(request):
     DEFAULT_AVATAR = '/static/images/gebruiker.svg'
 
-    print(request.GET['guid'])
-    user = User.objects.get(id=request.GET['guid'])
-    print(user.avatar)
-
     try:
-        user = User.objects.get(id=int(request.GET['guid']))
+        user = User.objects.get(guid=request.GET['guid'])
         if user.avatar:
             return redirect('/media/' + str(user.avatar))
     except User.DoesNotExist:
