@@ -7,7 +7,7 @@ from django.core import signing
 from django.contrib.auth import views
 from .helpers import send_activation_token, activate_and_login_user, send_suspicious_login_message
 from .forms import RegisterForm, UserProfileForm, PleioTOTPDeviceForm
-from .models import User
+from .models import User, Previous_logins
 from django.urls import reverse
 from base64 import b32encode
 from binascii import unhexlify
@@ -115,4 +115,30 @@ def tf_setup(request):
         'form': PleioTOTPDeviceForm(key=key, user=request.user),
         'QR_URL': reverse('two_factor:qr')
     })
+
+@login_required
+def previous_logins_list(request):
+    unconfirmed_login = Previous_logins.objects.all()
+    unconfirmed_login = unconfirmed_login.filter(user=request.user)
+    unconfirmed_login = unconfirmed_login.filter(confirmed_login=False)
+
+    confirmed_login = Previous_logins.objects.all()
+    confirmed_login = confirmed_login.filter(user=request.user)
+    confirmed_login = confirmed_login.filter(confirmed_login=True)
+
+    return render(request, 'login_list.html', {'unconfirmed_login_list': unconfirmed_login, 'confirmed_login_list': confirmed_login})
+
+@login_required
+def accept_previous_login(request, pk):
+    login = Previous_logins.objects.get(pk=pk)
+    login.confirmed_login=True
+    login.save()
+
+    return redirect('previous_logins')
+
+@login_required
+def decline_previous_login(request, pk):
+    login = Previous_logins.objects.get(pk=pk).delete()
+
+    return redirect('previous_logins')
 

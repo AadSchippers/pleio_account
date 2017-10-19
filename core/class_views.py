@@ -25,7 +25,7 @@ class PleioLoginView(LoginView):
         email = self.get_user()
         session = self.request.session
 
-        if not Previous_logins.is_known_login(session, email):
+        if not Previous_logins.is_confirmed_login(session, email):
             #           wanneer count == 0:  sessie komt niet voor in lijst, dus mail nodig
             send_suspicious_login_message(self.request, email)
 

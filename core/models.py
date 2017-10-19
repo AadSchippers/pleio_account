@@ -96,7 +96,6 @@ class User(AbstractBaseUser):
 class Previous_logins(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE)
     ip = models.GenericIPAddressField(null=True, blank=True, verbose_name='IP')
-    location =  models.CharField(null=True, max_length=200)
     user_agent = models.CharField(null=True, blank=True, max_length=200)
     last_login_date = models.DateTimeField(
             default=timezone.now)
@@ -107,11 +106,10 @@ class Previous_logins(models.Model):
         login = Previous_logins.objects.create(
             user = user,
             ip = session.ip,
-            location = None,
             user_agent = session.user_agent)
         login.save()
 
-    def is_known_login(session, email):
+    def is_confirmed_login(session, email):
         user = User.objects.get(email=email)
 
         login = Previous_logins.objects.all()
@@ -119,7 +117,16 @@ class Previous_logins(models.Model):
         login = login.filter(ip=session.ip)
         login = login.filter(user_agent=session.user_agent)
 
-        if login.count() == 0:
+        known_login = (login.count() > 0)
+
+        login = login.filter(confirmed_login=True)
+
+        confirmed_login = (login.count() > 0)
+
+        print('known_login: ', known_login)
+        print('confirmed_login: ', confirmed_login)
+
+        if not known_login:
             self = Previous_logins
             self.add_known_login(session, user)
         else:
@@ -127,7 +134,7 @@ class Previous_logins(models.Model):
                 l.last_login_date = timezone.now()
                 l.save()
 
-        return (login.count() > 0)
+        return confirmed_login
 
     def confirm_login(self):
         self.confirmed_login = True
