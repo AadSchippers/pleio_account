@@ -119,20 +119,15 @@ class Previous_logins(models.Model):
 
         known_login = (login.count() > 0)
 
-        login = login.filter(confirmed_login=True)
-
-        confirmed_login = (login.count() > 0)
-
-        print('known_login: ', known_login)
-        print('confirmed_login: ', confirmed_login)
-
         if not known_login:
-            self = Previous_logins
-            self.add_known_login(session, user)
+            Previous_logins.add_known_login(session, user)
         else:
-            for l in login:
-                l.last_login_date = timezone.now()
-                l.save()
+            l = login[0]
+            l.last_login_date = timezone.now()
+            l.save()
+
+        login = login.filter(confirmed_login=True)
+        confirmed_login = (login.count() > 0)
 
         return confirmed_login
 
