@@ -103,13 +103,12 @@ class PreviousLogins(models.Model):
     city = models.CharField(null=True, blank=True, max_length=100)
     country = models.CharField(null=True, blank=True, max_length=100)
     lat_lon = models.CharField(null=True, blank=True, max_length=100)
-    cookie_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 #    lat_lon = models.PointField(null=True, blank=True)
+    cookie_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     last_login_date = models.DateTimeField(default=timezone.now)
     confirmed_login = models.BooleanField(default=False)
 
     def add_known_login(session, user):
-        print('user: ', user)
         login = PreviousLogins.objects.create(
             user = user,
             ip = session.ip,
@@ -125,7 +124,7 @@ class PreviousLogins(models.Model):
         login = PreviousLogins.objects.all()
         login = login.filter(user=user)
         login = login.filter(ip=session.ip)
-        login = login.filter(user_agent=session.user_agent)
+        login = login.filter(user_agent=get_device(session.user_agent))
 
         known_login = (login.count() > 0)
 
@@ -133,13 +132,19 @@ class PreviousLogins(models.Model):
             PreviousLogins.add_known_login(session, user)
         else:
             l = login[0]
-            l.last_login_date = timezone.now()
-            l.save()
+            PreviousLogins.set_last_login_date(l.pk)
 
         login = login.filter(confirmed_login=True)
         confirmed_login = (login.count() > 0)
 
         return confirmed_login
 
+    def set_last_login_date(pk):
+        l = PreviousLogins.objects.get(pk=pk)
+        try:
+            l.last_login_date = timezone.now()
+            l.save()
+        except:
+            pass
 
 admin.site.register(User)
