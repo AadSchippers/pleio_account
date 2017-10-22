@@ -7,7 +7,8 @@ from django.core import signing
 from django.contrib.auth import views
 from .helpers import send_activation_token, activate_and_login_user, send_suspicious_login_message
 from .forms import RegisterForm, UserProfileForm, PleioTOTPDeviceForm
-from .models import User, Previous_logins
+from .models import User, PreviousLogins
+from .login_session_helpers import get_city, get_country, get_device, get_lat_lon
 from django.urls import reverse
 from base64 import b32encode
 from binascii import unhexlify
@@ -16,15 +17,18 @@ import django_otp
 from user_sessions.models import Session
 from core.class_views import PleioLoginView
 
+
 def home(request):
     if request.user.is_authenticated():
         return redirect('profile')
-    
+
     return redirect('login')
+
 
 def logout(request):
     auth.logout(request)
     return redirect('login')
+
 
 def register(request):
     if request.user.is_authenticated():
@@ -48,10 +52,12 @@ def register(request):
     else:
         form = RegisterForm()
 
-    return render(request, 'register.html', { 'form': form })
+    return render(request, 'register.html', {'form': form})
+
 
 def register_complete(request):
     return render(request, 'register_complete.html')
+
 
 def register_activate(request, activation_key=None):
     if request.user.is_authenticated():
@@ -63,6 +69,7 @@ def register_activate(request, activation_key=None):
 
     return render(request, 'register_activate.html')
 
+
 @login_required
 def profile(request):
     if request.method == 'POST':
@@ -73,7 +80,8 @@ def profile(request):
     else:
         form = UserProfileForm(instance=request.user)
 
-    return render(request, 'profile.html', { 'form': form })
+    return render(request, 'profile.html', {'form': form})
+
 
 def avatar(request):
     DEFAULT_AVATAR = '/static/images/gebruiker.svg'
@@ -91,9 +99,9 @@ def avatar(request):
 
     return redirect(DEFAULT_AVATAR)
 
+
 @login_required
 def tf_setup(request):
-
     if request.method == 'POST':
         key = request.session.get('tf_key')
         form = PleioTOTPDeviceForm(data=request.POST, key=key, user=request.user)
@@ -118,23 +126,24 @@ def tf_setup(request):
 
 @login_required
 def previous_logins_list(request):
-    login = Previous_logins.objects.filter(user=request.user)
+    login = PreviousLogins.objects.filter(user=request.user)
     unconfirmed_login = login.filter(confirmed_login=False)
     confirmed_login = login.filter(confirmed_login=True)
 
-    return render(request, 'login_list.html', {'unconfirmed_login_list': unconfirmed_login, 'confirmed_login_list': confirmed_login})
+    return render(request, 'login_list.html',
+                  {'unconfirmed_login_list': unconfirmed_login, 'confirmed_login_list': confirmed_login})
 
 @login_required
 def accept_previous_login(request, pk):
-    login = Previous_logins.objects.get(pk=pk)
-    login.confirmed_login=True
+    login = PreviousLogins.objects.get(pk=pk)
+    login.confirmed_login = True
     login.save()
 
     return redirect('previous_logins')
 
 @login_required
 def decline_previous_login(request, pk):
-    Previous_logins.objects.get(pk=pk).delete()
+    PreviousLogins.objects.get(pk=pk).delete()
 
     return redirect('previous_logins')
 

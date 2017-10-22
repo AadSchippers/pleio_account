@@ -4,7 +4,7 @@ from two_factor.forms import TOTPDeviceForm, BackupTokenForm
 from two_factor.views.core import LoginView, SetupView
 from user_sessions.models import Session
 from .helpers import send_suspicious_login_message
-from .models import Previous_logins
+from .models import PreviousLogins
 from django.db import models
 
 class PleioLoginView(LoginView):
@@ -25,15 +25,9 @@ class PleioLoginView(LoginView):
         email = self.get_user()
         session = self.request.session
 
-        if not Previous_logins.is_confirmed_login(session, email):
+        if not PreviousLogins.is_confirmed_login(session, email):
             #           wanneer count == 0:  sessie komt niet voor in lijst, dus mail nodig
             send_suspicious_login_message(self.request, email)
 
         return LoginView.done(self, form_list, **kwargs)
-
-
-
-
-
-
 
