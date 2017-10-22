@@ -73,7 +73,7 @@
           <td>{{ login.user_agent|device|default_if_none:unknown_on_unknown|safe }}</td>
           <td>{{ login.last_login_date}}</td>
           <td>
-            <form method="post" action="{% url 'decline_login' login.pk %}">
+              <form method="post" action="{% url 'decline_login' login.pk %}">
               {% csrf_token %}
                 <button type="submit" class="button __stretch">{% trans "Delete" %}</button>
             </form>

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, render_to_response
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
@@ -16,7 +16,6 @@ from django_otp.util import random_hex
 import django_otp
 from user_sessions.models import Session
 from core.class_views import PleioLoginView
-
 
 def home(request):
     if request.user.is_authenticated():
@@ -124,14 +123,25 @@ def tf_setup(request):
         'QR_URL': reverse('two_factor:qr')
     })
 
+
 @login_required
-def previous_logins_list(request):
+def previous_logins_list(request, pk=0):
     login = PreviousLogins.objects.filter(user=request.user)
     unconfirmed_login = login.filter(confirmed_login=False)
     confirmed_login = login.filter(confirmed_login=True)
 
-    return render(request, 'login_list.html',
-                  {'unconfirmed_login_list': unconfirmed_login, 'confirmed_login_list': confirmed_login})
+    response = render(request, 'login_list.html', {
+        'unconfirmed_login_list': unconfirmed_login,
+        'confirmed_login_list': confirmed_login
+    })
+
+    if pk != 0:
+        login = PreviousLogins.objects.get(pk=pk)
+        cookie_id = login.cookie_id
+        max_age = 365 * 24 * 60 * 60  # one year
+        response.set_cookie('cookie_id', cookie_id, max_age=max_age)
+
+    return response
 
 @login_required
 def accept_previous_login(request, pk):
@@ -139,7 +149,8 @@ def accept_previous_login(request, pk):
     login.confirmed_login = True
     login.save()
 
-    return redirect('previous_logins')
+    return redirect('previous_logins', pk)
+
 
 @login_required
 def decline_previous_login(request, pk):
