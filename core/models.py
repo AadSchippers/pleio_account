@@ -5,6 +5,9 @@ from django.core.mail import send_mail
 from django.contrib import admin
 from django.db import models
 from .helpers import unique_filepath
+from .login_session_helpers import get_city, get_country, get_device, get_lat_lon
+import uuid
+#from django.contrib.gis.db import models
 
 class Manager(BaseUserManager):
     def create_user(self, email, name, password=None, accepted_terms=False, receives_newsletter=False):
@@ -93,26 +96,33 @@ class User(AbstractBaseUser):
     def is_staff(self):
         return self.is_admin
 
-class Previous_logins(models.Model):
+class PreviousLogins(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE)
     ip = models.GenericIPAddressField(null=True, blank=True, verbose_name='IP')
     user_agent = models.CharField(null=True, blank=True, max_length=200)
-    last_login_date = models.DateTimeField(
-            default=timezone.now)
+    city = models.CharField(null=True, blank=True, max_length=100)
+    country = models.CharField(null=True, blank=True, max_length=100)
+    lat_lon = models.CharField(null=True, blank=True, max_length=100)
+    cookie_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+#    lat_lon = models.PointField(null=True, blank=True)
+    last_login_date = models.DateTimeField(default=timezone.now)
     confirmed_login = models.BooleanField(default=False)
 
     def add_known_login(session, user):
         print('user: ', user)
-        login = Previous_logins.objects.create(
+        login = PreviousLogins.objects.create(
             user = user,
             ip = session.ip,
-            user_agent = session.user_agent)
+            user_agent = get_device(session.user_agent),
+            city = get_city(session.ip),
+            country = get_country(session.ip),
+            lat_lon = get_lat_lon(session.ip))
         login.save()
 
     def is_confirmed_login(session, email):
         user = User.objects.get(email=email)
 
-        login = Previous_logins.objects.all()
+        login = PreviousLogins.objects.all()
         login = login.filter(user=user)
         login = login.filter(ip=session.ip)
         login = login.filter(user_agent=session.user_agent)
@@ -120,7 +130,7 @@ class Previous_logins(models.Model):
         known_login = (login.count() > 0)
 
         if not known_login:
-            Previous_logins.add_known_login(session, user)
+            PreviousLogins.add_known_login(session, user)
         else:
             l = login[0]
             l.last_login_date = timezone.now()
@@ -130,11 +140,6 @@ class Previous_logins(models.Model):
         confirmed_login = (login.count() > 0)
 
         return confirmed_login
-
-    def confirm_login(self):
-        self.confirmed_login = True
-        self.save()
-
 
 
 admin.site.register(User)

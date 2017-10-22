@@ -18,7 +18,9 @@
     <table class="table">
       <thead>
         <tr>
-          <th>{% trans "Location" %}</th>
+          <th>{% trans "City" %}</th>
+          <th>{% trans "Country" %}</th>
+          <th>{% trans "IP address" %}</th>
           <th>{% trans "Device" %}</th>
           <th>{% trans "Last login" %}</th>
           <th>{% trans "Accept login" %}</th>
@@ -27,7 +29,9 @@
       </thead>
       {% for login in unconfirmed_login_list %}
         <tr {% if login.session_key == session_key %}class="active"{% endif %}>
-          <td>{{ login.ip|location|default_if_none:unknown|safe }} <small>({{ login.ip }})</small></td>
+          <td>{{ login.city|default_if_none:unknown|safe }}</td>
+          <td>{{ login.country|default_if_none:unknown|safe }}</td>
+          <td>{{ login.ip }}</td>
           <td>{{ login.user_agent|device|default_if_none:unknown_on_unknown|safe }}</td>
           <td>{{ login.last_login_date}}</td>
           <td>
@@ -53,7 +57,9 @@
     <table class="table">
       <thead>
         <tr>
-          <th>{% trans "Location" %}</th>
+          <th>{% trans "City" %}</th>
+          <th>{% trans "Country" %}</th>
+          <th>{% trans "IP address" %}</th>
           <th>{% trans "Device" %}</th>
           <th>{% trans "Last login" %}</th>
           <th>{% trans "Delete login" %}</th>
@@ -61,7 +67,9 @@
       </thead>
       {% for login in confirmed_login_list %}
         <tr {% if login.session_key == session_key %}class="active"{% endif %}>
-          <td>{{ login.ip|location|default_if_none:unknown|safe }} <small>({{ login.ip }})</small></td>
+          <td>{{ login.city|default_if_none:unknown|safe }}</td>
+          <td>{{ login.country|default_if_none:unknown|safe }}</td>
+          <td>{{ login.ip }}</td>
           <td>{{ login.user_agent|device|default_if_none:unknown_on_unknown|safe }}</td>
           <td>{{ login.last_login_date}}</td>
           <td>
