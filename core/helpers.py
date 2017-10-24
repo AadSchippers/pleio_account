@@ -55,15 +55,18 @@ def unique_filepath(self, filename):
     filename = "%s.%s" % (uuid.uuid4(), ext)
     return os.path.join('avatars/', filename)
 
-def send_suspicious_login_message(request, email):
-#    from .models import User
+def send_suspicious_login_message(request, device_id, email):
+    from .login_session_helpers import get_city, get_country
 
     session = request.session
     template_context = {
         'site': get_current_site(request),
-        'ip_address': session.ip,
         'user': email,
         'user_agent': session.user_agent,
+        'ip_address': session.ip,
+        'city': get_city(session.ip),
+        'country': get_country(session.ip),
+        'acceptation_key': generate_acceptation_token(device_id)
     }
 
     email.email_user(
@@ -71,3 +74,36 @@ def send_suspicious_login_message(request, email):
         render_to_string('emails/send_suspicious_login_message.txt', template_context),
         settings.DEFAULT_FROM_EMAIL
     )
+
+def generate_acceptation_token(device_id):
+    return signing.dumps(
+        obj=device_id
+    )
+
+def accept_previous_logins(request, acceptation_key):
+    from .models import PreviousLogins
+
+    try:
+        device_id = signing.loads(
+            acceptation_key,
+            max_age=settings.ACCOUNT_ACTIVATION_DAYS * 86400
+        )
+        print('device_id 1: ', device_id)
+
+        if device_id is None:
+            return False
+
+        try:
+            login = PreviousLogins.objects.get(device_id=device_id)
+            login.confirmed_login = True
+            login.save()
+        except:
+            pass
+
+        return True
+
+    #except (signing.BadSignature, PreviousLogins.DoesNotExist):
+    except:
+        print('device_id 2: ', device_id)
+        return False
+

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, render_to_response
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
-from .helpers import send_activation_token, activate_and_login_user
+from .helpers import send_activation_token, activate_and_login_user, accept_previous_logins
 from .forms import RegisterForm, UserProfileForm, PleioTOTPDeviceForm
 from .models import User, PreviousLogins
 from django.urls import reverse
@@ -131,7 +131,7 @@ def previous_logins_list(request):
 
 
 @login_required
-def accept_previous_login(request, pk):
+def accept_login(request, pk):
     login = PreviousLogins.objects.get(pk=pk)
     login.confirmed_login = True
     login.save()
@@ -140,8 +140,16 @@ def accept_previous_login(request, pk):
 
 
 @login_required
-def decline_previous_login(request, pk):
+def decline_login(request, pk):
     PreviousLogins.objects.get(pk=pk).delete()
 
     return redirect('previous_logins')
 
+
+def accept_previous_login(request, acceptation_key=None):
+
+    result = accept_previous_logins(request, acceptation_key)
+    if result:
+        return redirect('previous_logins')
+
+    return redirect('profile')
