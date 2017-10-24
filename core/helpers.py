@@ -5,7 +5,6 @@ from django.conf import settings
 from django.core import signing
 import uuid
 import os
-from user_sessions.models import Session
 
 def send_activation_token(request, user):
     template_context = {

@@ -41,7 +41,6 @@ urls = [
     url(r'^login/$', PleioLoginView.as_view(), name='login'),
     url(r'^logout/$', views.logout, name='logout'),
     url(r'^profile/$', views.profile, name='profile'),
-    url(r'^previous_logins/(?P<pk>\d+)/$', views.previous_logins_list, name='previous_logins'),
     url(r'^previous_logins/$', views.previous_logins_list, name='previous_logins'),
     url(r'^accept_login/(?P<pk>\d+)/$', view=views.accept_previous_login, name='accept_login'),
     url(r'^decline_login/(?P<pk>\d+)/$', view=views.decline_previous_login, name='decline_login'),
