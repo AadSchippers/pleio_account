@@ -1,21 +1,15 @@
 from django.shortcuts import render, redirect, render_to_response
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail
-from django.conf import settings
-from django.core import signing
-from django.contrib.auth import views
-from .helpers import send_activation_token, activate_and_login_user, send_suspicious_login_message
+from .helpers import send_activation_token, activate_and_login_user
 from .forms import RegisterForm, UserProfileForm, PleioTOTPDeviceForm
 from .models import User, PreviousLogins
-from .login_session_helpers import get_city, get_country, get_device, get_lat_lon
 from django.urls import reverse
 from base64 import b32encode
 from binascii import unhexlify
 from django_otp.util import random_hex
 import django_otp
-from user_sessions.models import Session
-from core.class_views import PleioLoginView
+
 
 def home(request):
     if request.user.is_authenticated():
@@ -125,23 +119,16 @@ def tf_setup(request):
 
 
 @login_required
-def previous_logins_list(request, pk=0):
+def previous_logins_list(request):
     login = PreviousLogins.objects.filter(user=request.user)
     unconfirmed_login = login.filter(confirmed_login=False)
     confirmed_login = login.filter(confirmed_login=True)
 
-    response = render(request, 'login_list.html', {
+    return render(request, 'login_list.html', {
         'unconfirmed_login_list': unconfirmed_login,
         'confirmed_login_list': confirmed_login
     })
 
-    if pk != 0:
-        login = PreviousLogins.objects.get(pk=pk)
-        cookie_id = login.cookie_id
-        max_age = 365 * 24 * 60 * 60  # one year
-        response.set_cookie('cookie_id', cookie_id, max_age=max_age)
-
-    return response
 
 @login_required
 def accept_previous_login(request, pk):
@@ -149,7 +136,7 @@ def accept_previous_login(request, pk):
     login.confirmed_login = True
     login.save()
 
-    return redirect('previous_logins', pk)
+    return redirect('previous_logins')
 
 
 @login_required
