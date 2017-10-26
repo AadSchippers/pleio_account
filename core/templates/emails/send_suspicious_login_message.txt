@@ -8,7 +8,7 @@
 {% trans "City" %}: {{ city }}
 {% trans "Country" %}: {{ country }}
 
-{% trans "If it was you, please navigate to this link:" %}: http://{{ site.domain }}{% url 'accept_previous_login' acceptation_key %}
+{% trans "If it was you, please navigate to this link" %}: http://{{ site.domain }}{% url 'accept_previous_login' acceptation_key %}
 {% trans "Otherwise you might want to change your password." %}
 
 

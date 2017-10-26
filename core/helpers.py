@@ -88,7 +88,6 @@ def accept_previous_logins(request, acceptation_key):
             acceptation_key,
             max_age=settings.ACCOUNT_ACTIVATION_DAYS * 86400
         )
-        print('device_id 1: ', device_id)
 
         if device_id is None:
             return False
@@ -102,8 +101,6 @@ def accept_previous_logins(request, acceptation_key):
 
         return True
 
-    #except (signing.BadSignature, PreviousLogins.DoesNotExist):
-    except:
-        print('device_id 2: ', device_id)
+    except (signing.BadSignature, PreviousLogins.DoesNotExist):
         return False
 
