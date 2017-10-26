@@ -5,6 +5,7 @@ from django.conf import settings
 from django.core import signing
 import uuid
 import os
+from user_sessions.models import Session
 
 def send_activation_token(request, user):
     template_context = {
@@ -54,3 +55,18 @@ def unique_filepath(self, filename):
     ext = filename.split('.')[-1]
     filename = "%s.%s" % (uuid.uuid4(), ext)
     return os.path.join('avatars/', filename)
+
+def send_login_check(request, user):
+    session = request.session
+    template_context = {
+        'site': get_current_site(request),
+        'ip_address': session.ip,
+        'user': user,
+        'user_agent': session.user_agent,
+    }
+
+    user.email_user(
+        render_to_string('emails/login_check_subject.txt', template_context),
+        render_to_string('emails/login_check.txt', template_context),
+        settings.DEFAULT_FROM_EMAIL
+    )

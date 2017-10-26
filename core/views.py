@@ -5,9 +5,16 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.core import signing
 from django.contrib.auth import views
-from .helpers import send_activation_token, activate_and_login_user
-from .forms import RegisterForm, UserProfileForm
+from .helpers import send_activation_token, activate_and_login_user, send_login_check
+from .forms import RegisterForm, UserProfileForm, PleioTOTPDeviceForm
 from .models import User
+from django.urls import reverse
+from base64 import b32encode
+from binascii import unhexlify
+from django_otp.util import random_hex
+import django_otp
+from user_sessions.models import Session
+from core.class_views import PleioLoginView
 
 def home(request):
     if request.user.is_authenticated():
@@ -62,8 +69,9 @@ def profile(request):
         form = UserProfileForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             user = form.save()
+
     else:
-        form = UserProfileForm(instance=request.user) 
+        form = UserProfileForm(instance=request.user)
 
     return render(request, 'profile.html', { 'form': form })
 
@@ -78,3 +86,29 @@ def avatar(request):
         pass
 
     return redirect(DEFAULT_AVATAR)
+
+@login_required
+def tf_setup(request):
+
+    if request.method == 'POST':
+        key = request.session.get('tf_key')
+        form = PleioTOTPDeviceForm(data=request.POST, key=key, user=request.user)
+
+        if form.is_valid():
+            device = form.save()
+            django_otp.login(request, device)
+            return redirect('two_factor:setup_complete')
+
+    else:
+        key = random_hex(20).decode('ascii')
+        rawkey = unhexlify(key.encode('ascii'))
+        b32key = b32encode(rawkey).decode('utf-8')
+
+        request.session['tf_key'] = key
+        request.session['django_two_factor-qr_secret_key'] = b32key
+
+    return render(request, 'tf_setup.html', {
+        'form': PleioTOTPDeviceForm(key=key, user=request.user),
+        'QR_URL': reverse('two_factor:qr')
+    })
+

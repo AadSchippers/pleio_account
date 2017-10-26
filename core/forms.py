@@ -1,6 +1,9 @@
 from django.utils.translation import gettext, gettext_lazy as _
 from django.contrib.auth import password_validation
 from django import forms
+from django.contrib.auth.forms import AuthenticationForm
+from two_factor.forms import AuthenticationTokenForm, TOTPDeviceForm
+from two_factor.utils import totp_digits
 from .models import User
 
 class EmailField(forms.EmailField):
@@ -41,3 +44,16 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ('name', 'email', 'avatar')
+
+class PleioAuthenticationForm(AuthenticationForm):
+    is_persistent = forms.BooleanField(required=False, initial=True)
+
+    class Meta:
+        model = User
+        fields = ('email', 'password', 'is_persistent')
+
+class PleioAuthenticationTokenForm(AuthenticationTokenForm):
+    otp_token = forms.IntegerField(label=_("Token"), widget=forms.TextInput)
+
+class PleioTOTPDeviceForm(TOTPDeviceForm):
+    token = forms.IntegerField(label=_("Token"), widget=forms.TextInput)

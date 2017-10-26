@@ -1,0 +1,10 @@
+{% load user_sessions i18n %}{% trans "<em>unknown on unknown</em>" as unknown_on_unknown %}{% trans "<em>unknown</em>" as unknown %}
+
+{% trans "Someone has logged in using your account at " %} {{ site.name }}
+
+{% trans "If it wasn't you, please navigate to your session list and delete this session" %}:
+
+{% trans "IP address" %}: {{ ip_address }}
+{% trans "User" %}: {{ user }}
+{% trans "User agent" %}: {{ user_agent|device|default_if_none:unknown_on_unknown|safe }}
+

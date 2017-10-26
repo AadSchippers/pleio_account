@@ -11,6 +11,8 @@
 
 <form method="post" action=".">
     {% csrf_token %}
+    <p>Welkom op Pleio. Meld u aan om in te loggen.</p>
+
     <fieldset>
         <div class="input-field">
             <label for="id_name">{% trans "First- and lastname" %}</label>
@@ -47,8 +49,16 @@
         </div>
 
         <div class="register__button">
-            <button name="register" class="button ___stretch ___active" type="submit">{% trans "Register" %}</button>
+            <table><tr>
+                <td {padding: 15px;}>
+                    <button name="register" class="button ___stretch ___active" type="submit">{% trans "Register" %}</button>
+                 </td>
+                <td {padding: 15px;}>
+                    <a href="{% url 'login' %}" class="button"> {% trans "Back" %}</a>
+                </td>
+            </tr></table>
         </div>
+
 </form>
 
 {% endblock %}
