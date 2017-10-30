@@ -1,0 +1,90 @@
+{% extends "us_base.html" %}
+{% load user_sessions i18n %}
+
+{% block content %}
+<fieldset>
+  {% trans "<em>unknown on unknown</em>" as unknown_on_unknown %}
+  {% trans "<em>unknown</em>" as unknown %}
+  <h3>{% trans "Previous logins" %}</h3><br>
+    {% if unconfirmed_login_list.count == 0 %}
+      {% if confirmed_login_list.count == 0 %}
+  <p>{% trans "No previous logins" %}</p>
+      {% endif %}
+    {% endif %}
+
+  {% if unconfirmed_login_list.count > 0 %}
+    <h3>{% trans "Unconfirmed previous logins" %}</h3><br>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>{% trans "City" %}</th>
+          <th>{% trans "Country" %}</th>
+          <th>{% trans "IP address" %}</th>
+          <th>{% trans "Device" %}</th>
+          <th>{% trans "Last login" %}</th>
+          <th>{% trans "Accept login" %}</th>
+          <th>{% trans "Decline login" %}</th>
+        </tr>
+      </thead>
+      {% for login in unconfirmed_login_list %}
+        <tr {% if login.session_key == session_key %}class="active"{% endif %}>
+          <td>{{ login.city|default_if_none:unknown|safe }}</td>
+          <td>{{ login.country|default_if_none:unknown|safe }}</td>
+          <td>{{ login.ip }}</td>
+          <td>{{ login.user_agent|device|default_if_none:unknown_on_unknown|safe }}</td>
+          <td>{{ login.last_login_date}}</td>
+          <td>
+            <form method="post" action="{% url 'accept_login' login.pk %}">
+              {% csrf_token %}
+                <button type="submit" class="button __stretch">{% trans "Accept" %}</button>
+            </form>
+          </td>
+          <td>
+            <form method="post" action="{% url 'decline_login' login.pk %}">
+              {% csrf_token %}
+                <button type="submit" class="button __stretch">{% trans "Decline" %}</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+  {% endif %}
+
+  {% if confirmed_login_list.count > 0 %}
+    <h3>{% trans "Confirmed previous logins" %}</h3><br>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>{% trans "City" %}</th>
+          <th>{% trans "Country" %}</th>
+          <th>{% trans "IP address" %}</th>
+          <th>{% trans "Device" %}</th>
+          <th>{% trans "Last login" %}</th>
+          <th>{% trans "Delete login" %}</th>
+        </tr>
+      </thead>
+      {% for login in confirmed_login_list %}
+        <tr {% if login.session_key == session_key %}class="active"{% endif %}>
+          <td>{{ login.city|default_if_none:unknown|safe }}</td>
+          <td>{{ login.country|default_if_none:unknown|safe }}</td>
+          <td>{{ login.ip }}</td>
+          <td>{{ login.user_agent|device|default_if_none:unknown_on_unknown|safe }}</td>
+          <td>{{ login.last_login_date}}</td>
+          <td>
+              <form method="post" action="{% url 'decline_login' login.pk %}">
+              {% csrf_token %}
+                <button type="submit" class="button __stretch">{% trans "Delete" %}</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+  {% endif %}
+
+  <div class="input-field">
+       <a href="{% url 'profile' %}" class="button">{% trans "Back to Profile" %}</a>
+  </div>
+</fieldset>
+{% endblock %}

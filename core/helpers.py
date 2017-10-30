@@ -75,12 +75,6 @@ def send_suspicious_login_message(request, device_id, email):
         settings.DEFAULT_FROM_EMAIL
     )
 
-    email.email_user(
-        render_to_string('emails/send_suspicious_login_message_subject.txt', template_context),
-        render_to_string('emails/send_suspicious_login_message.html', template_context),
-        settings.DEFAULT_FROM_EMAIL
-    )
-
 def generate_acceptation_token(device_id):
     return signing.dumps(
         obj=device_id
@@ -109,4 +103,3 @@ def accept_previous_logins(request, acceptation_key):
 
     except (signing.BadSignature, PreviousLogins.DoesNotExist):
         return False
-

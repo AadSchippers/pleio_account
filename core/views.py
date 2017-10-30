@@ -1,20 +1,14 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, render_to_response
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail
-from django.conf import settings
-from django.core import signing
-from django.contrib.auth import views
-from .helpers import send_activation_token, activate_and_login_user, send_login_check
+from .helpers import send_activation_token, activate_and_login_user, accept_previous_logins
 from .forms import RegisterForm, UserProfileForm, PleioTOTPDeviceForm
-from .models import User
+from .models import User, PreviousLogins
 from django.urls import reverse
 from base64 import b32encode
 from binascii import unhexlify
 from django_otp.util import random_hex
 import django_otp
-from user_sessions.models import Session
-from core.class_views import PleioLoginView
 
 
 def home(request):
@@ -85,8 +79,12 @@ def profile(request):
 def avatar(request):
     DEFAULT_AVATAR = '/static/images/gebruiker.svg'
 
+    print(request.GET['guid'])
+    user = User.objects.get(id=request.GET['guid'])
+    print(user.avatar)
+
     try:
-        user = User.objects.get(guid=request.GET['guid'])
+        user = User.objects.get(id=int(request.GET['guid']))
         if user.avatar:
             return redirect('/media/' + str(user.avatar))
     except User.DoesNotExist:
@@ -118,3 +116,40 @@ def tf_setup(request):
         'form': PleioTOTPDeviceForm(key=key, user=request.user),
         'QR_URL': reverse('two_factor:qr')
     })
+
+
+@login_required
+def previous_logins_list(request):
+    login = PreviousLogins.objects.filter(user=request.user)
+    unconfirmed_login = login.filter(confirmed_login=False)
+    confirmed_login = login.filter(confirmed_login=True)
+
+    return render(request, 'login_list.html', {
+        'unconfirmed_login_list': unconfirmed_login,
+        'confirmed_login_list': confirmed_login
+    })
+
+
+@login_required
+def accept_login(request, pk):
+    login = PreviousLogins.objects.get(pk=pk)
+    login.confirmed_login = True
+    login.save()
+
+    return redirect('previous_logins')
+
+
+@login_required
+def decline_login(request, pk):
+    PreviousLogins.objects.get(pk=pk).delete()
+
+    return redirect('previous_logins')
+
+
+def accept_previous_login(request, acceptation_key=None):
+
+    result = accept_previous_logins(request, acceptation_key)
+    if result:
+        return redirect('previous_logins')
+
+    return redirect('profile')
