@@ -1,5 +1,6 @@
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
+from django.template import RequestContext, Template
 from django.contrib import auth
 from django.conf import settings
 from django.core import signing
@@ -66,14 +67,16 @@ def send_suspicious_login_message(request, device_id, email):
         'ip_address': session.ip,
         'city': get_city(session.ip),
         'country': get_country(session.ip),
-        'acceptation_key': generate_acceptation_token(device_id)
+        'acceptation_key': generate_acceptation_token(device_id),
     }
 
     email.email_user(
         render_to_string('emails/send_suspicious_login_message_subject.txt', template_context),
         render_to_string('emails/send_suspicious_login_message.txt', template_context),
-        settings.DEFAULT_FROM_EMAIL
+        settings.DEFAULT_FROM_EMAIL,
+        html_message = (render_to_string('emails/send_suspicious_login_message.html', template_context))
     )
+
 
 def generate_acceptation_token(device_id):
     return signing.dumps(

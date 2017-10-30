@@ -959,7 +959,9 @@
                                                         {% trans "City" %}: {{ city }}<br>
                                                         {% trans "Country" %}: {{ country }}<br>
                                                         <br>
-                                                        {% trans "If it was you, please navigate to this link" %}: http://{{ site.domain }}{% url 'accept_previous_login' acceptation_key %}<br>
+                                                        {% trans "If it was you, please navigate to " %}<a href="http://{{ site.domain }}{% url 'accept_previous_login' acceptation_key %}">{% trans "this link" %}</a><br>
+                                                        {% trans "Or copy/paste this link into your browser" %}: http://{{ site.domain }}{% url 'accept_previous_login' acceptation_key %}<br>
+                                                        <br>
                                                         {% trans "Otherwise you might want to change your password." %}
                                                     </p>
 

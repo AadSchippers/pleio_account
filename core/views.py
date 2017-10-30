@@ -118,38 +118,10 @@ def tf_setup(request):
     })
 
 
-@login_required
-def previous_logins_list(request):
-    login = PreviousLogins.objects.filter(user=request.user)
-    unconfirmed_login = login.filter(confirmed_login=False)
-    confirmed_login = login.filter(confirmed_login=True)
-
-    return render(request, 'login_list.html', {
-        'unconfirmed_login_list': unconfirmed_login,
-        'confirmed_login_list': confirmed_login
-    })
-
-
-@login_required
-def accept_login(request, pk):
-    login = PreviousLogins.objects.get(pk=pk)
-    login.confirmed_login = True
-    login.save()
-
-    return redirect('previous_logins')
-
-
-@login_required
-def decline_login(request, pk):
-    PreviousLogins.objects.get(pk=pk).delete()
-
-    return redirect('previous_logins')
-
-
 def accept_previous_login(request, acceptation_key=None):
-
-    result = accept_previous_logins(request, acceptation_key)
-    if result:
-        return redirect('previous_logins')
+    try:
+        accept_previous_logins(request, acceptation_key)
+    except:
+        pass
 
     return redirect('profile')

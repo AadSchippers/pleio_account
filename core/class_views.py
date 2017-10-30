@@ -30,12 +30,9 @@ class PleioLoginView(LoginView):
 
             try:
                 login = PreviousLogins.objects.get(device_id=device_id)
-                previous_login_present = True
+                previous_login_present = login.confirmed_login
             except:
                 previous_login_present = False
-
-            print("previous_login_present: ", previous_login_present)
-            print("device_id: ", device_id)
 
             if previous_login_present:
                 #cookie aanwezig, geen e-mail sturen
