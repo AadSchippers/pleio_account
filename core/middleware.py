@@ -9,6 +9,8 @@ class DeviceIdMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
         try:
             device_id = request.COOKIES['device_id']
+            if len(device_id) < 8:
+                raise KeyError
         except KeyError:
             device_id = get_random_string(32, VALID_KEY_CHARS)
 

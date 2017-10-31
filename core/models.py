@@ -101,11 +101,19 @@ class PreviousLogins(models.Model):
     user_agent = models.CharField(null=True, blank=True, max_length=200)
     city = models.CharField(null=True, blank=True, max_length=100)
     country = models.CharField(null=True, blank=True, max_length=100)
-    lat_lon = models.CharField(null=True, blank=True, max_length=100)
+    latitude = models.DecimalField(max_digits=5, decimal_places=3, null=True)
+    longitude = models.DecimalField(max_digits=6, decimal_places=3, null=True)
     last_login_date = models.DateTimeField(default=timezone.now)
     confirmed_login = models.BooleanField(default=False)
 
     def add_known_login(session, device_id, user):
+        lat_lon = get_lat_lon(session.ip)
+        try:
+            latitude = lat_lon[0]
+            longitude = lat_lon[1]
+        except:
+            latitude = None
+            longitude = None
 
         login = PreviousLogins.objects.create(
             user = user,
@@ -114,7 +122,9 @@ class PreviousLogins(models.Model):
             user_agent = get_device(session.user_agent),
             city = get_city(session.ip),
             country = get_country(session.ip),
-            lat_lon = get_lat_lon(session.ip))
+            latitude = latitude,
+            longitude = longitude,
+         )
         login.save()
 
     def is_confirmed_login(session, device_id, email):
