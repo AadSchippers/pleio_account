@@ -68,6 +68,7 @@ def send_suspicious_login_message(request, device_id, email):
         'city': get_city(session.ip),
         'country': get_country(session.ip),
         'acceptation_key': generate_acceptation_token(device_id),
+        'pleio_logo_small': request.build_absolute_uri("/static/images/pleio_logo_small.png")
     }
 
     email.email_user(

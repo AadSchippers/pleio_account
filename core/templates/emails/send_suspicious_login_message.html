@@ -960,6 +960,7 @@
                                                         {% trans "Country" %}: {{ country }}<br>
                                                         <br>
                                                         {% trans "If it was you, please navigate to " %}<a href="http://{{ site.domain }}{% url 'accept_previous_login' acceptation_key %}">{% trans "this link" %}</a><br>
+                                                        <br>
                                                         {% trans "Or copy/paste this link into your browser" %}: http://{{ site.domain }}{% url 'accept_previous_login' acceptation_key %}<br>
                                                         <br>
                                                         {% trans "Otherwise you might want to change your password." %}
@@ -998,8 +999,8 @@
                                                     style="padding-right: 9px; padding-left: 9px; padding-top: 0; padding-bottom: 0; text-align:center;">
 
 
-                                                    <img align="center" alt=""
-                                                         src="https://gallery.mailchimp.com/7bdc5284a7b6f882a03293327/images/f3c109b0-333d-4a14-a95d-b6667ac69349.png"
+                                                    <img align="center" alt="{{ pleio_logo_small }}"
+                                                         src={{ pleio_logo_small }}
                                                          width="84"
                                                          style="max-width:168px; padding-bottom: 0; display: inline !important; vertical-align: bottom;"
                                                          class="mcnImage">
