@@ -41,6 +41,7 @@ urls = [
     url(r'^login/$', PleioLoginView.as_view(), name='login'),
     url(r'^logout/$', views.logout, name='logout'),
     url(r'^profile/$', views.profile, name='profile'),
+    url(r'^accept_previous_logins/(?P<acceptation_key>[-:\w]+)/$', views.accept_previous_login, name='accept_previous_login'),
     url(r'^account/login/$', PleioLoginView.as_view(), name='login'),
     url(r'^account/two_factor/setup/$', views.tf_setup, name='tf_setup'),
     url(r'^account/two_factor/setup/complete/$', view=SetupCompleteView.as_view(template_name = 'setup_complete.html'), name='setup_complete' ),
@@ -64,7 +65,6 @@ us_urls = [
 ]
 
 urlpatterns = legacy_urls + urls +  tf_urls + us_urls
-
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

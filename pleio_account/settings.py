@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 from django.utils.translation import ugettext_lazy as _
+from .config import *
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -19,14 +20,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '5svsb7*kzmz#2aw&=tp^vio_g1is43!m60)%y7jv)xt=&!jw=x'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
 
 WEBPACK_LOADER = {
     'DEFAULT': {
@@ -86,6 +79,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django_otp.middleware.OTPMiddleware',
+    'core.middleware.DeviceIdMiddleware'
 ]
 
 ROOT_URLCONF = 'pleio_account.urls'
@@ -109,16 +103,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'pleio_account.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/1.10/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
 
 SESSION_ENGINE = 'user_sessions.backends.db'
 
@@ -175,7 +159,8 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'assets/'),
 ]
 
-GEOIP_PATH = os.path.join(BASE_DIR, 'geopip2/')
+GEOIP_PATH = os.path.join(BASE_DIR, 'assets/geopip2/')
+#GEOS_LIBRARY_PATH = os.path.join(BASE_DIR, 'bin/geos')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
@@ -183,10 +168,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 LOGIN_URL = 'two_factor:login'
 LOGIN_REDIRECT_URL = '/profile/'
 LOGOUT_REDIRECT_URL = 'two_factor:login'
-
-FROM_EMAIL = ('Pleio', 'no-reply@pleio.nl')
-EMAIL_HOST = 'localhost'
-EMAIL_PORT = 1025
 
 PASSWORD_RESET_TIMEOUT_DAYS = 1
 ACCOUNT_ACTIVATION_DAYS = 7

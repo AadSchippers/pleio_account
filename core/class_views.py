@@ -2,9 +2,8 @@ from .forms import PleioAuthenticationForm, PleioAuthenticationTokenForm
 
 from two_factor.forms import TOTPDeviceForm, BackupTokenForm
 from two_factor.views.core import LoginView, SetupView
-from user_sessions.models import Session
-from .helpers import send_login_check
-from django.db import models
+from .helpers import send_suspicious_login_message
+from .models import PreviousLogins
 
 class PleioLoginView(LoginView):
     template_name = 'login.html'
@@ -21,29 +20,28 @@ class PleioLoginView(LoginView):
         else:
             self.request.session.set_expiry(0)
 
-        user = self.get_user()
-        session_current = self.request.session
+        email = self.get_user()
+        session = self.request.session
 
-        session_filtered = Session.objects.all()
-        session_filtered = session_filtered.filter(session_key=session_current.session_key)
-        session_filtered = session_filtered.filter(user=user)
+        check_previous_logins = True
 
-        if session_filtered.count() == 0:
-#       wanneer count > 0: session_key bestaat al, bekende sessie: geen mail nodig
-#       wanneer count == 0:  session_key bestaat niet, controle op ip/user_agent nodig
+        if 'device_id' in self.request.COOKIES:
+            device_id = self.request.COOKIES['device_id']
 
-            session_filtered = Session.objects.all()
-            session_filtered = session_filtered.exclude(session_key=session_current.session_key)
-            session_filtered = session_filtered.filter(user=user)
-            session_filtered = session_filtered.filter(ip=session_current.ip)
-            session_filtered = session_filtered.filter(user_agent=session_current.user_agent)
+            try:
+                login = PreviousLogins.objects.get(device_id=device_id)
+                previous_login_present = login.confirmed_login
+            except:
+                previous_login_present = False
 
-            if session_filtered.count() == 0:
-#           wanneer count == 0:  sessie komt niet voor in lijst, dus mail nodig
-                send_login_check(self.request, user)
+            if previous_login_present:
+                #cookie is present so no need to send an email and no further checking is requiered
+                check_previous_logins = False
+                PreviousLogins.update_previous_login(session, login.pk)
+
+        if check_previous_logins:
+            if not PreviousLogins.is_confirmed_login(session, device_id, email):
+                #no confirmed matching login found, so email must be sent
+                send_suspicious_login_message(self.request, device_id, email)
 
         return LoginView.done(self, form_list, **kwargs)
-
-
-
-

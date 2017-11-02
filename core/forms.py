@@ -6,6 +6,7 @@ from two_factor.forms import AuthenticationTokenForm, TOTPDeviceForm
 from two_factor.utils import totp_digits
 from .models import User
 
+
 class EmailField(forms.EmailField):
     def clean(self, value):
         super(EmailField, self).clean(value)
@@ -14,6 +15,7 @@ class EmailField(forms.EmailField):
             raise forms.ValidationError("This e-mail is already registered.")
         except User.DoesNotExist:
             return value
+
 
 class RegisterForm(forms.Form):
     error_messages = {
@@ -36,14 +38,16 @@ class RegisterForm(forms.Form):
                 self.error_messages['password_mismatch'],
                 code='password_mismatch',
             )
-            
+
         password_validation.validate_password(self.cleaned_data.get('password2'))
         return password2
+
 
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ('name', 'email', 'avatar')
+
 
 class PleioAuthenticationForm(AuthenticationForm):
     is_persistent = forms.BooleanField(required=False, initial=True)
@@ -52,8 +56,10 @@ class PleioAuthenticationForm(AuthenticationForm):
         model = User
         fields = ('email', 'password', 'is_persistent')
 
+
 class PleioAuthenticationTokenForm(AuthenticationTokenForm):
     otp_token = forms.IntegerField(label=_("Token"), widget=forms.TextInput)
+
 
 class PleioTOTPDeviceForm(TOTPDeviceForm):
     token = forms.IntegerField(label=_("Token"), widget=forms.TextInput)

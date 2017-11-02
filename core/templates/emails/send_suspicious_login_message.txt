@@ -2,9 +2,13 @@
 
 {% trans "Someone has logged in using your account at " %} {{ site.name }}
 
-{% trans "If it wasn't you, please navigate to your session list and delete this session" %}:
-
 {% trans "IP address" %}: {{ ip_address }}
 {% trans "User" %}: {{ user }}
 {% trans "User agent" %}: {{ user_agent|device|default_if_none:unknown_on_unknown|safe }}
+{% trans "City" %}: {{ city }}
+{% trans "Country" %}: {{ country }}
+
+{% trans "If it was you, please navigate to this link" %}: http://{{ site.domain }}{% url 'accept_previous_login' acceptation_key %}
+{% trans "Otherwise you might want to change your password." %}
+
 

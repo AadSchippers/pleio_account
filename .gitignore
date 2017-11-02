@@ -9,4 +9,4 @@ webpack-stats.json
 webpack-stats-prod.json
 media/
 .idea/
-
+config.py
