@@ -16,8 +16,7 @@ def send_activation_token(request, user):
 
     user.email_user(
         render_to_string('emails/register_subject.txt', template_context),
-        render_to_string('emails/register.txt', template_context),
-        settings.DEFAULT_FROM_EMAIL
+        render_to_string('emails/register.txt', template_context)
     )
 
 def generate_activation_token(email):
@@ -75,9 +74,9 @@ def send_suspicious_login_message(request, device_id, email):
         render_to_string('emails/send_suspicious_login_message_subject.txt', template_context),
         render_to_string('emails/send_suspicious_login_message.txt', template_context),
         settings.DEFAULT_FROM_EMAIL,
-        html_message = (render_to_string('emails/send_suspicious_login_message.html', template_context))
+        html_message = (render_to_string('emails/send_suspicious_login_message.html', template_context)),
+        fail_silently=True
     )
-
 
 def generate_acceptation_token(device_id):
     return signing.dumps(

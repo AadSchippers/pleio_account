@@ -1,5 +1,5 @@
 from .forms import PleioAuthenticationForm, PleioAuthenticationTokenForm
-
+from django.conf import settings
 from two_factor.forms import TOTPDeviceForm, BackupTokenForm
 from two_factor.views.core import LoginView, SetupView
 from .helpers import send_suspicious_login_message
@@ -23,7 +23,7 @@ class PleioLoginView(LoginView):
         email = self.get_user()
         session = self.request.session
 
-        check_previous_logins = True
+        check_previous_logins = settings.CHECK_PREVIOUS_LOGINS
 
         if 'device_id' in self.request.COOKIES:
             device_id = self.request.COOKIES['device_id']

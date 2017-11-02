@@ -9,4 +9,5 @@ webpack-stats.json
 webpack-stats-prod.json
 media/
 .idea/
-config.py
+pleio_account/config.py
+

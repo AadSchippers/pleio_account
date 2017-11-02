@@ -46,7 +46,7 @@ module.exports = {
     devtool: "source-map",
     plugins: [
         new ExtractTextPlugin("[name].css"),
-        new BundleTracker({filename: "./webpack-stats-prod.json"}),
+        new BundleTracker({filename: "./webpack-stats.json"}),
         new webpack.LoaderOptionsPlugin({
             options: {
                 postcss: [ autoprefixer({ browsers: ["last 2 versions"] }) ]

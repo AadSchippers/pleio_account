@@ -4,6 +4,7 @@ from django.utils.text import slugify
 from django.core.mail import send_mail
 from django.contrib import admin
 from django.db import models
+from django.conf import settings
 from .helpers import unique_filepath
 from .login_session_helpers import get_city, get_country, get_device, get_lat_lon
 
@@ -87,8 +88,8 @@ class User(AbstractBaseUser):
     def get_short_name(self):
         return self.name
 
-    def email_user(self, subject, message, from_email=None, **kwargs):
-        send_mail(subject, message, from_email, [self.email], **kwargs)
+    def email_user(self, subject, message, **kwargs):
+        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [self.email], **kwargs)
 
     @property
     def is_staff(self):
